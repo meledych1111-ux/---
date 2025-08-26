@@ -7,43 +7,53 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>👠 StepStyle</h1>
-        <p>Ваш стиль начинается с правильной обуви!</p>
-    </div>
+    <div class="container">
+        <header class="header">
+            <h1>👟 StepStyle</h1>
+            <p>Ваш стиль начинается с правильной обуви!</p>
+        </header>
 
-    <div class="filters">
-        <input type="text" id="search-input" placeholder="🔍 Поиск обуви...">
-        <select id="price-filter">
-            <option value="all">💎 Все цены</option>
-            <option value="0-5000">💰 До 5000 руб.</option>
-            <option value="5000-10000">💵 5000-10000 руб.</option>
-            <option value="10000+">💎 От 10000 руб.</option>
-        </select>
-    </div>
+        <nav class="categories">
+            <button class="category-btn active" data-category="all">Все товары</button>
+            <button class="category-btn" data-category="sneakers">👟 Кроссовки</button>
+            <button class="category-btn" data-category="boots">👢 Ботинки</button>
+            <button class="category-btn" data-category="shoes">👞 Туфли</button>
+            <button class="category-btn" data-category="heels">👠 Каблуки</button>
+        </nav>
 
-    <div class="products" id="products-container">
-        <!-- Товары будут здесь -->
-    </div>
-
-    <!-- Плавающая кнопка корзины -->
-    <div class="cart-floating" onclick="app.showCart()">
-        🛒
-        <div class="cart-badge" id="cart-badge">0</div>
-    </div>
-
-    <!-- Модальное окно корзины -->
-    <div class="cart-modal" id="cart-modal">
-        <div class="cart-content">
-            <button class="close-modal" onclick="app.hideCart()">×</button>
-            <h2>🛒 Ваша корзина</h2>
-            <div id="cart-items">
-                <!-- Товары корзины -->
+        <div class="filters">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="🔍 Поиск по названию...">
             </div>
-            <div class="cart-total">
-                <h3>🎯 Общая сумма: <span id="cart-total">0</span> руб.</h3>
-                <button onclick="app.checkout()">✅ Оформить заказ</button>
-                <button onclick="app.clearCart()" class="btn-danger">🗑️ Очистить корзину</button>
+            <select id="price-filter">
+                <option value="all">💎 Все цены</option>
+                <option value="0-5000">💰 До 5 000 руб.</option>
+                <option value="5000-10000">💵 5 000 - 10 000 руб.</option>
+                <option value="10000+">💎 От 10 000 руб.</option>
+            </select>
+        </div>
+
+        <div class="products" id="products-container">
+            <!-- Товары будут здесь -->
+        </div>
+
+        <!-- Плавающая кнопка корзины -->
+        <div class="cart-floating" onclick="app.showCart()">
+            🛒
+            <div class="cart-badge" id="cart-badge">0</div>
+        </div>
+
+        <!-- Модальное окно корзины -->
+        <div class="cart-modal" id="cart-modal">
+            <div class="cart-content">
+                <button class="close-modal" onclick="app.hideCart()">×</button>
+                <h2>🛒 Ваша корзина</h2>
+                <div id="cart-items"></div>
+                <div class="cart-total">
+                    <h3>🎯 Общая сумма: <span id="cart-total">0</span> руб.</h3>
+                    <button onclick="app.checkout()">✅ Оформить заказ</button>
+                    <button onclick="app.clearCart()" class="btn-danger">🗑️ Очистить корзину</button>
+                </div>
             </div>
         </div>
     </div>
