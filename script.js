@@ -102,6 +102,7 @@ class ShoeStoreApp {
 
         cartItems.innerHTML = this.cartService.cart.map((item, index) => `
             <div class="cart-item">
+                <img src="${item.product.image}" alt="${item.product.name}" class="cart-item-image">
                 <div class="cart-item-info">
                     <strong>${item.product.name}</strong><br>
                     Размер: ${item.size}<br>
