@@ -5,6 +5,11 @@ import { UIService } from './modules/UIService.js';
 
 class ShoeStore {
     constructor() {
+        this.filters = {
+            category: 'all',
+            maxPrice: 10000,
+            size: 'all'
+        };
         this.init();
     }
 
@@ -17,7 +22,8 @@ class ShoeStore {
 
     initEventListeners() {
         // Фильтрация товаров
-        FilterService.initFilters(() => {
+        const filterManager = FilterService.initFilters(() => {
+            this.filters = filterManager.getFilters();
             this.renderProducts();
         });
 
@@ -38,6 +44,11 @@ class ShoeStore {
 
         // Оформление заказа
         document.getElementById('checkoutBtn').addEventListener('click', () => {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                NotificationService.show('Корзина пуста!', 'error');
+                return;
+            }
             document.getElementById('cartModal').style.display = 'none';
             document.getElementById('paymentModal').style.display = 'block';
         });
@@ -49,12 +60,42 @@ class ShoeStore {
             localStorage.removeItem('cart');
             UIService.updateCartCount();
             document.getElementById('paymentModal').style.display = 'none';
+            
+            // Очистка формы
+            e.target.reset();
+        });
+
+        // Быстрые фильтры по категориям (добавляем в шапку)
+        this.addQuickCategoryFilters();
+    }
+
+    addQuickCategoryFilters() {
+        // Добавляем быстрые кнопки категорий в шапку
+        const nav = document.querySelector('.nav');
+        const quickFilters = document.createElement('div');
+        quickFilters.className = 'quick-filters';
+        quickFilters.innerHTML = `
+            <button class="quick-filter" data-category="sneakers">Кроссовки</button>
+            <button class="quick-filter" data-category="boots">Ботинки</button>
+            <button class="quick-filter" data-category="sandals">Сандалии</button>
+            <button class="quick-filter" data-category="heels">Туфли</button>
+            <button class="quick-filter" data-category="all">Все товары</button>
+        `;
+        nav.appendChild(quickFilters);
+
+        // Обработчики для быстрых фильтров
+        document.querySelectorAll('.quick-filter').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const category = e.target.dataset.category;
+                document.getElementById('categoryFilter').value = category;
+                this.filters.category = category;
+                this.renderProducts();
+            });
         });
     }
 
     renderProducts() {
-        const filters = FilterService.initFilters(() => {}).getFilters();
-        const filteredProducts = ProductService.filterProducts(filters);
+        const filteredProducts = ProductService.filterProducts(this.filters);
         UIService.renderProducts(filteredProducts);
     }
 
