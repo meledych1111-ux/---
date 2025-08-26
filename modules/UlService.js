@@ -1,112 +1,107 @@
-export class UIService {
-    constructor() {
-        this.selectedSizes = {};
-    }
+import { CardService } from './CardService.js';
+import { ProductService } from './ProductService.js';
 
-    // Отображение товаров
-    displayProducts(products, containerId) {
-        const container = document.getElementById(containerId);
-        if (!container) return;
+export class UIService {
+    static renderProducts(products) {
+        const productsGrid = document.getElementById('productsGrid');
+        productsGrid.innerHTML = '';
 
         if (products.length === 0) {
-            container.innerHTML = this.getNoProductsHTML();
+            productsGrid.innerHTML = '<p>Товары не найдены</p>';
             return;
         }
 
-        container.innerHTML = products.map(product => this.getProductHTML(product)).join('');
+        products.forEach(product => {
+            const card = CardService.createProductCard(product);
+            productsGrid.appendChild(card);
+        });
     }
 
-    getProductHTML(product) {
-        return `
-            <div class="product-card" data-id="${product.id}" data-category="${product.category}">
-                <img src="${product.image}" alt="${product.name}" 
-                     onerror="this.src='https://via.placeholder.com/400x300/CCCCCC/white?text=Нет+фото'">
-                <h3>${product.name}</h3>
-                <p class="description">${product.description}</p>
-                <div class="price">${product.price.toLocaleString('ru-RU')} руб.</div>
+    static initModals() {
+        const modals = document.querySelectorAll('.modal');
+        const closeButtons = document.querySelectorAll('.close');
+
+        // Закрытие модальных окон
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                modals.forEach(modal => modal.style.display = 'none');
+            });
+        });
+
+        // Закрытие при клике вне окна
+        window.addEventListener('click', (e) => {
+            modals.forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        // Открытие модальных окон
+        document.getElementById('authBtn').addEventListener('click', () => {
+            document.getElementById('authModal').style.display = 'block';
+        });
+
+        document.getElementById('cartBtn').addEventListener('click', () => {
+            document.getElementById('cartModal').style.display = 'block';
+            this.renderCart();
+        });
+    }
+
+    static renderCart() {
+        const cartItems = document.getElementById('cartItems');
+        const totalPrice = document.getElementById('totalPrice');
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        
+        cartItems.innerHTML = '';
+        let total = 0;
+
+        if (cart.length === 0) {
+            cartItems.innerHTML = '<p>Корзина пуста</p>';
+            totalPrice.textContent = '0';
+            return;
+        }
+
+        cart.forEach(item => {
+            const product = ProductService.getProductById(item.id);
+            if (product) {
+                total += product.price * item.quantity;
                 
-                <div class="sizes">
-                    <strong>Размеры:</strong>
-                    ${product.sizes.map(size => this.getSizeButtonHTML(product.id, size)).join('')}
-                </div>
-                
-                <button class="add-to-cart" 
-                        onclick="app.addToCart(${product.id})"
-                        ${!this.selectedSizes[product.id] ? 'disabled' : ''}>
-                    🛒 Добавить в корзину
-                </button>
-            </div>
-        `;
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-info">
+                        <h4>${product.name}</h4>
+                        <p class="cart-item-price">${product.price} руб. x ${item.quantity}</p>
+                    </div>
+                    <button class="remove-from-cart" data-id="${product.id}">Удалить</button>
+                `;
+                cartItems.appendChild(cartItem);
+            }
+        });
+
+        totalPrice.textContent = total;
+
+        // Обработчики для кнопок удаления
+        document.querySelectorAll('.remove-from-cart').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const productId = parseInt(e.target.dataset.id);
+                this.removeFromCart(productId);
+            });
+        });
     }
 
-    getSizeButtonHTML(productId, size) {
-        const isSelected = this.selectedSizes[productId] === size;
-        return `
-            <button class="size-btn ${isSelected ? 'selected' : ''}" 
-                    onclick="app.selectSize(${productId}, ${size})">
-                ${size}
-            </button>
-        `;
+    static updateCartCount() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById('cartCount').textContent = totalItems;
     }
 
-    getNoProductsHTML() {
-        return `
-            <div class="empty-cart">
-                <h3>😔 Товары не найдены</h3>
-                <p>Попробуйте изменить параметры поиска или фильтры</p>
-            </div>
-        `;
-    }
-
-    // Работа с корзиной
-    updateCartDisplay(cart) {
-        const badge = document.getElementById('cart-badge');
-        const totalElement = document.getElementById('cart-total');
-        
-        if (badge) badge.textContent = cart.getCartItemsCount();
-        if (totalElement) totalElement.textContent = cart.getCartTotal().toLocaleString('ru-RU');
-    }
-
-    showCartModal() {
-        const modal = document.getElementById('cart-modal');
-        if (modal) modal.style.display = 'flex';
-    }
-
-    hideCartModal() {
-        const modal = document.getElementById('cart-modal');
-        if (modal) modal.style.display = 'none';
-    }
-
-    // Уведомления
-    showNotification(message, type = 'info') {
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.innerHTML = message;
-        
-        document.body.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.remove();
-        }, 3000);
-    }
-
-    // Выбор размера
-    selectSize(productId, size) {
-        this.selectedSizes[productId] = size;
-        this.updateSizeSelection(productId, size);
-    }
-
-    updateSizeSelection(productId, size) {
-        const productCard = document.querySelector(`.product-card[data-id="${productId}"]`);
-        if (!productCard) return;
-
-        const sizeButtons = productCard.querySelectorAll('.size-btn');
-        sizeButtons.forEach(btn => btn.classList.remove('selected'));
-        
-        const selectedBtn = productCard.querySelector(`.size-btn[onclick="app.selectSize(${productId}, ${size})"]`);
-        if (selectedBtn) selectedBtn.classList.add('selected');
-
-        const addButton = productCard.querySelector('.add-to-cart');
-        if (addButton) addButton.disabled = false;
+    static removeFromCart(productId) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart = cart.filter(item => item.id !== productId);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        this.renderCart();
+        this.updateCartCount();
     }
 }
