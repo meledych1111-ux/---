@@ -1,41 +1,49 @@
 import { products } from './products.js';
 
 export class ProductService {
-    constructor() {
-        this.products = products;
+    static getAllProducts() {
+        return products;
     }
 
-    getAllProducts() {
-        return this.products;
+    static getProductsByCategory(category) {
+        if (category === 'all') return products;
+        return products.filter(product => product.category === category);
     }
 
-    getProductById(id) {
-        return this.products.find(product => product.id === id);
+    static getProductsByPrice(maxPrice) {
+        return products.filter(product => product.price <= maxPrice);
     }
 
-    getProductsByCategory(category) {
-        if (category === 'all') return this.products;
-        return this.products.filter(product => product.category === category);
+    static getProductsBySize(size) {
+        if (size === 'all') return products;
+        return products.filter(product => product.sizes.includes(parseInt(size)));
     }
 
-    searchProducts(searchText) {
-        const searchLower = searchText.toLowerCase();
-        return this.products.filter(product =>
-            product.name.toLowerCase().includes(searchLower) ||
-            product.description.toLowerCase().includes(searchLower)
-        );
+    static getProductById(id) {
+        return products.find(product => product.id === id);
     }
 
-    filterByPrice(products, priceRange) {
-        switch (priceRange) {
-            case '0-5000':
-                return products.filter(product => product.price <= 5000);
-            case '5000-10000':
-                return products.filter(product => product.price > 5000 && product.price <= 10000);
-            case '10000+':
-                return products.filter(product => product.price > 10000);
-            default:
-                return products;
+    static filterProducts(filters) {
+        let filteredProducts = products;
+
+        if (filters.category && filters.category !== 'all') {
+            filteredProducts = filteredProducts.filter(
+                product => product.category === filters.category
+            );
         }
+
+        if (filters.maxPrice) {
+            filteredProducts = filteredProducts.filter(
+                product => product.price <= filters.maxPrice
+            );
+        }
+
+        if (filters.size && filters.size !== 'all') {
+            filteredProducts = filteredProducts.filter(
+                product => product.sizes.includes(parseInt(filters.size))
+            );
+        }
+
+        return filteredProducts;
     }
 }
