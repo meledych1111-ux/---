@@ -8,6 +8,14 @@
 </head>
 <body>
     <div class="container">
+        <!-- Блок авторизации в header -->
+        <div class="auth-section">
+            <span id="user-greeting" style="display: none;">Добро пожаловать!</span>
+            <button id="login-btn" onclick="app.showLoginModal()">Войти</button>
+            <button id="register-btn" onclick="app.showRegisterModal()">Регистрация</button>
+            <button id="logout-btn" onclick="app.logout()" style="display: none;">Выйти</button>
+        </div>
+
         <header class="header">
             <h1>👟 StepStyle</h1>
             <p>Ваш стиль начинается с правильной обуви!</p>
@@ -16,9 +24,8 @@
         <nav class="categories">
             <button class="category-btn active" data-category="all">Все товары</button>
             <button class="category-btn" data-category="sneakers">👟 Кроссовки</button>
-            <button class="category-btn" data-category="boots">👢 Ботинки</button>
             <button class="category-btn" data-category="shoes">👞 Туфли</button>
-            <button class="category-btn" data-category="heels">👠 Каблуки</button>
+            <button class="category-btn" data-category="boots">👢 Сапоги</button>
         </nav>
 
         <div class="filters">
@@ -51,14 +58,53 @@
                 <div id="cart-items"></div>
                 <div class="cart-total">
                     <h3>🎯 Общая сумма: <span id="cart-total">0</span> руб.</h3>
-                    <button onclick="app.checkout()">✅ Оформить заказ</button>
+                    <!-- Выбор способа оплаты в корзине -->
+                    <div class="payment-methods">
+                        <div class="payment-method" data-method="card" onclick="app.selectPaymentMethod('card')">
+                            <h3>💳 Банковская карта</h3>
+                        </div>
+                        <div class="payment-method" data-method="sbp" onclick="app.selectPaymentMethod('sbp')">
+                            <h3>📱 СБП</h3>
+                        </div>
+                        <div class="payment-method" data-method="mir" onclick="app.selectPaymentMethod('mir')">
+                            <h3>🇷🇺 Мир</h3>
+                        </div>
+                    </div>
+                    <button onclick="app.processPayment()" class="pay-button">✅ Оформить заказ</button>
                     <button onclick="app.clearCart()" class="btn-danger">🗑️ Очистить корзину</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <<!-- В head добавляем -->
-<script type="module" src="script.js"></script>
+    <!-- Модальное окно регистрации -->
+    <div class="modal" id="register-modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="app.hideRegisterModal()">×</button>
+            <h2>📝 Регистрация</h2>
+            <form id="register-form">
+                <input type="text" name="name" placeholder="👤 ФИО" required>
+                <input type="email" name="email" placeholder="📧 Email" required>
+                <input type="password" name="password" placeholder="🔒 Пароль" required>
+                <input type="tel" name="phone" placeholder="📞 Телефон">
+                <button type="submit">Зарегистрироваться</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно входа -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="app.hideLoginModal()">×</button>
+            <h2>🔑 Вход</h2>
+            <form id="login-form">
+                <input type="email" name="email" placeholder="📧 Email" required>
+                <input type="password" name="password" placeholder="🔒 Пароль" required>
+                <button type="submit">Войти</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
