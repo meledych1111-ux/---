@@ -1,52 +1,29 @@
 export class FilterService {
-    constructor() {
-        this.filters = {
-            category: 'all',
-            searchText: '',
-            priceRange: 'all'
+    static initFilters(onFilterChange) {
+        const categoryFilter = document.getElementById('categoryFilter');
+        const priceFilter = document.getElementById('priceFilter');
+        const priceValue = document.getElementById('priceValue');
+        const sizeFilter = document.getElementById('sizeFilter');
+
+        // Установка начальных значений
+        priceFilter.value = 10000;
+        priceValue.textContent = '10000 руб.';
+
+        // Обработчики событий
+        categoryFilter.addEventListener('change', onFilterChange);
+        sizeFilter.addEventListener('change', onFilterChange);
+        
+        priceFilter.addEventListener('input', (e) => {
+            priceValue.textContent = `${e.target.value} руб.`;
+            onFilterChange();
+        });
+
+        return {
+            getFilters: () => ({
+                category: categoryFilter.value,
+                maxPrice: parseInt(priceFilter.value),
+                size: sizeFilter.value
+            })
         };
     }
-
-    updateFilter(key, value) {
-        this.filters[key] = value;
-    }
-
-    getCurrentFilters() {
-        return this.filters;
-    }
-
-    applyFilters(products, filters) {
-        let result = [...products];
-
-        // Фильтр по категории
-        if (filters.category && filters.category !== 'all') {
-            result = result.filter(p => p.category === filters.category);
-        }
-
-        // Фильтр по поиску
-        if (filters.searchText && filters.searchText.trim() !== '') {
-            const query = filters.searchText.toLowerCase();
-            result = result.filter(p =>
-                p.name.toLowerCase().includes(query) ||
-                p.description.toLowerCase().includes(query)
-            );
-        }
-
-        // Фильтр по цене
-        if (filters.priceRange && filters.priceRange !== 'all') {
-            switch (filters.priceRange) {
-                case '0-5000':
-                    result = result.filter(p => p.price <= 5000);
-                    break;
-                case '5000-10000':
-                    result = result.filter(p => p.price > 5000 && p.price <= 10000);
-                    break;
-                case '10000+':
-                    result = result.filter(p => p.price > 10000);
-                    break;
-            }
-        }
-
-        return result;
-    } 
-
+}
