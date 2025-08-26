@@ -1,69 +1,45 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StepStyle - Магазин обуви</title>
-    <link rel="stylesheet" href="style.css">
-    <script type="module" src="script.js"></script>
+  <meta charset="UTF-8">
+  <title>Магазин обуви</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>👟 StepStyle</h1>
-            <p>Ваш стиль начинается с правильной обуви!</p>
-        </header>
 
-        <nav class="categories">
-            <button class="category-btn active" data-category="all">Все товары</button>
-            <button class="category-btn" data-category="sneakers">👟 Кроссовки</button>
-            <button class="category-btn" data-category="shoes">👞 Туфли</button>
-            <button class="category-btn" data-category="boots">👢 Сапоги</button>
-        </nav>
+  <!-- Поиск -->
+  <input id="search-input" type="text" placeholder="Поиск...">
 
-        <div class="filters">
-            <div class="search-box">
-                <input type="text" id="search-input" placeholder="🔍 Поиск по названию...">
-            </div>
-            <select id="price-filter">
-                <option value="all">💎 Все цены</option>
-                <option value="0-5000">💰 До 5 000 руб.</option>
-                <option value="5000-10000">💵 5 000 - 10 000 руб.</option>
-                <option value="10000+">💎 От 10 000 руб.</option>
-            </select>
-        </div>
+  <!-- Фильтры -->
+  <select id="price-filter">
+    <option value="all">Все цены</option>
+    <option value="0-5000">До 5000</option>
+    <option value="5000-10000">5000 - 10000</option>
+    <option value="10000+">Больше 10000</option>
+  </select>
 
-        <div class="products" id="products-container">
-            <!-- Товары будут здесь -->
-        </div>
+  <!-- Категории -->
+  <div>
+    <button class="category-btn active" data-category="all">Все</button>
+    <button class="category-btn" data-category="sneakers">Кроссовки</button>
+    <button class="category-btn" data-category="boots">Сапоги</button>
+    <button class="category-btn" data-category="shoes">Туфли</button>
+  </div>ш
 
-        <!-- Плавающая кнопка корзины -->
-        <div class="cart-floating" onclick="app.showCart()">
-            🛒
-            <div class="cart-badge" id="cart-badge">0</div>
-        </div>
-    </div>
+  <!-- Список товаров -->
+  <div id="products-container"></div>
 
-    <!-- Модальное окно корзины -->
-    <div id="cart-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="app.hideCart()">&times;</span>
-            <h2>🛒 Ваша корзина</h2>
-            <div id="cart-items" class="cart-items">
-                <!-- Товары корзины будут здесь -->
-            </div>
-            <div class="cart-total">
-                <h3>🎯 Общая сумма: <span id="cart-total">0</span> руб.</h3>
-                <button onclick="app.checkout()" class="btn-primary">
-                    ✅ Оформить заказ
-                </button>
-                <button onclick="app.clearCart()" class="btn-danger">
-                    🗑️ Очистить корзину
-                </button>
-            </div>
-        </div>
-    </div>
+  <!-- Корзина -->
+  <div id="cart-modal" style="display:none;">
+    <h2>Корзина</h2>
+    <div id="cart-items"></div>
+    <p>Итого: <span id="cart-total">0</span> руб.</p>
+    <button onclick="app.checkout()">Оформить заказ</button>
+    <button onclick="app.clearCart()">Очистить</button>
+    <button onclick="app.hideCart()">Закрыть</button>
+  </div>
 
-    <script type="module" src="script.js"></script>
+  <!-- 🔥 ВАЖНО: именно так подключаем -->
+  <script type="module" src="./script.js"></script>
 </body>
 </html>
