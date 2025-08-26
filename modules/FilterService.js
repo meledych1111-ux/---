@@ -46,10 +46,7 @@ export class FilterService {
                     break;
             }
         }
-applyFilters(products, filters) {
-    return products; // временно отключаем фильтрацию
-}
+
         return result;
-    }
-}
+    } 
 
