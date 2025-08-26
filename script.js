@@ -1,157 +1,166 @@
-import { ProductService } from './modules/ProductService.js';
-import { CartService } from './modules/CartService.js';
-import { UIService } from './modules/UIService.js';
-import { FilterService } from './modules/FilterService.js';
+import { ProductService } from './services/ProductService.js';
+import { Cart } from './services/CartService.js';
 
-class ShoeStoreApp {
-    constructor() {
-        this.productService = new ProductService();
-        this.cartService = new CartService();
-        this.uiService = new UIService();
-        this.filterService = new FilterService();
-        
-        this.init();
-    }
+// Главный объект приложения
+const app = {
+    productService: new ProductService(),
+    cart: new Cart(),
+    filteredProducts: [],
 
+    // Инициализация приложения
     init() {
+        this.filteredProducts = this.productService.getAllProducts();
+        this.renderProducts();
         this.setupEventListeners();
-        this.displayProducts();
-        this.updateCartDisplay();
-    }
+        this.updateCartUI();
+    },
 
+    // Настройка обработчиков событий
     setupEventListeners() {
-        // Поиск
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                this.filterService.updateFilter('searchText', e.target.value);
-                this.displayProducts();
-            });
-        }
-
-        // Фильтр по цене
-        const priceFilter = document.getElementById('price-filter');
-        if (priceFilter) {
-            priceFilter.addEventListener('change', (e) => {
-                this.filterService.updateFilter('priceRange', e.target.value);
-                this.displayProducts();
-            });
-        }
-
-        // Фильтр по категориям
-        const categoryButtons = document.querySelectorAll('.category-btn');
-        categoryButtons.forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                categoryButtons.forEach(b => b.classList.remove('active'));
+        // Обработчики для кнопок категорий
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                document.querySelectorAll('.category-btn').forEach(btn => 
+                    btn.classList.remove('active'));
                 e.target.classList.add('active');
-                
-                this.filterService.updateFilter('category', e.target.dataset.category);
-                this.displayProducts();
+                this.applyFilters();
             });
         });
-    }
 
-    displayProducts() {
-        const allProducts = this.productService.getAllProducts();
-        const filters = this.filterService.getCurrentFilters();
-        const filteredProducts = this.filterService.applyFilters(allProducts, filters);
+        // Обработчик для поиска
+        document.getElementById('search-input').addEventListener('input', () => {
+            this.applyFilters();
+        });
+
+        // Обработчик для фильтра цены
+        document.getElementById('price-filter').addEventListener('change', () => {
+            this.applyFilters();
+        });
+    },
+
+    // Применение всех фильтров
+    applyFilters() {
+        const activeCategory = document.querySelector('.category-btn.active').dataset.category;
+        const searchText = document.getElementById('search-input').value;
+        const priceRange = document.getElementById('price-filter').value;
         
-        this.uiService.displayProducts(filteredProducts, 'products-container');
-    }
+        // Получаем отфильтрованные товары
+        let filtered = this.productService.getProductsByCategory(activeCategory);
+        
+        if (searchText) {
+            filtered = this.productService.searchProducts(searchText, filtered);
+        }
+        
+        filtered = this.productService.filterByPrice(filtered, priceRange);
+        
+        this.filteredProducts = filtered;
+        this.renderProducts();
+    },
 
-    selectSize(productId, size) {
-        this.uiService.selectSize(productId, size);
-    }
+    // Отрисовка товаров
+    renderProducts() {
+        const productsContainer = document.getElementById('products-container');
+        productsContainer.innerHTML = '';
 
+        if (this.filteredProducts.length === 0) {
+            productsContainer.innerHTML = `
+                <div class="no-products">
+                    <p>Товары не найдены</p>
+                    <p>Попробуйте изменить параметры поиска</p>
+                </div>
+            `;
+            return;
+        }
+
+        this.filteredProducts.forEach(product => {
+            const productElement = document.createElement('div');
+            productElement.className = 'product';
+            productElement.innerHTML = `
+                <img src="${product.image}" alt="${product.name}" class="product-image">
+                <h3 class="product-name">${product.name}</h3>
+                <p class="product-description">${product.description}</p>
+                <div class="product-details">
+                    <span class="product-price">${product.price.toLocaleString()} руб.</span>
+                    <span class="product-sizes">Размеры: ${product.sizes.join(', ')}</span>
+                </div>
+                <button class="add-to-cart-btn" onclick="app.addToCart(${product.id})">
+                    🛒 В корзину
+                </button>
+            `;
+            productsContainer.appendChild(productElement);
+        });
+    },
+
+    // Добавление товара в корзину
     addToCart(productId) {
-        const size = this.uiService.selectedSizes[productId];
-        if (!size) {
-            this.uiService.showNotification('⚠️ Пожалуйста, выберите размер!', 'warning');
-            return;
-        }
-
         const product = this.productService.getProductById(productId);
-        if (!product) return;
-
-        this.cartService.addToCart(product, size);
-        this.updateCartDisplay();
-        this.uiService.showNotification(`✅ Добавлено: ${product.name} (размер ${size})`, 'success');
-    }
-
-    updateCartDisplay() {
-        this.uiService.updateCartDisplay(this.cartService);
-    }
-
-    showCart() {
-        this.uiService.showCartModal();
-        this.updateCartItems();
-    }
-
-    hideCart() {
-        this.uiService.hideCartModal();
-    }
-
-    updateCartItems() {
-        const cartItems = document.getElementById('cart-items');
-        if (!cartItems) return;
-
-        if (this.cartService.cart.length === 0) {
-            cartItems.innerHTML = '<p class="empty-cart">Корзина пуста</p>';
-            return;
+        if (product) {
+            this.cart.addItem(product);
+            this.updateCartUI();
+            
+            // Показываем уведомление
+            this.showNotification(`Товар "${product.name}" добавлен в корзину!`);
         }
+    },
 
-        cartItems.innerHTML = this.cartService.cart.map((item, index) => `
-            <div class="cart-item">
-                <img src="${item.product.image}" alt="${item.product.name}" class="cart-item-image">
-                <div class="cart-item-info">
-                    <strong>${item.product.name}</strong><br>
-                    Размер: ${item.size}<br>
-                    ${item.product.price.toLocaleString('ru-RU')} руб. × ${item.quantity}
-                </div>
-                <div class="cart-item-actions">
-                    <button class="quantity-btn" onclick="app.changeQuantity(${index}, -1)">-</button>
-                    <span style="margin: 0 10px; font-weight: bold;">${item.quantity}</span>
-                    <button class="quantity-btn" onclick="app.changeQuantity(${index}, 1)">+</button>
-                    <button class="quantity-btn btn-danger" onclick="app.removeFromCart(${index})">×</button>
-                </div>
-            </div>
-        `).join('');
-    }
+    // Показать уведомление
+    showNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        // Показываем уведомление
+        setTimeout(() => notification.classList.add('show'), 100);
+        
+        // Убираем через 3 секунды
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 3000);
+    },
 
-    changeQuantity(index, delta) {
-        const item = this.cartService.cart[index];
-        this.cartService.updateQuantity(item.product.id, item.size, delta);
-        this.updateCartDisplay();
-        this.updateCartItems();
-    }
+    // Обновление UI корзины
+    updateCartUI() {
+        const badge = document.getElementById('cart-badge');
+        const totalElement = document.getElementById('cart-total');
+        
+        if (badge) badge.textContent = this.cart.getItemCount();
+        if (totalElement) totalElement.textContent = this.cart.getTotal().toLocaleString();
+    },
 
-    removeFromCart(index) {
-        const item = this.cartService.cart[index];
-        this.cartService.removeFromCart(item.product.id, item.size);
-        this.updateCartDisplay();
-        this.updateCartItems();
-    }
+    // Показать корзину
+    showCart() {
+        alert('Функция просмотра корзины будет реализована в следующей версии!');
+        // Здесь будет модальное окно с деталями корзины
+    },
 
-    clearCart() {
-        this.cartService.clearCart();
-        this.updateCartDisplay();
-        this.updateCartItems();
-        this.hideCart();
-        this.uiService.showNotification('🗑️ Корзина очищена!', 'success');
-    }
-
+    // Оформить заказ
     checkout() {
-        if (this.cartService.cart.length === 0) {
-            this.uiService.showNotification('⚠️ Корзина пуста!', 'warning');
+        if (this.cart.getItems().length === 0) {
+            alert('Корзина пуста! Добавьте товары перед оформлением заказа.');
             return;
         }
         
-        const total = this.cartService.getCartTotal();
-        this.uiService.showNotification(`🎉 Заказ оформлен! Сумма: ${total.toLocaleString('ru-RU')} руб. Спасибо!`, 'success');
-        this.clearCart();
-    }
-}
+        alert(`Заказ оформлен! Сумма: ${this.cart.getTotal().toLocaleString()} руб.`);
+        this.cart.clear();
+        this.updateCartUI();
+    },
 
-// Инициализация приложения
-const app = new ShoeStoreApp();
+    // Очистить корзину
+    clearCart() {
+        if (confirm('Вы уверены, что хотите очистить корзину?')) {
+            this.cart.clear();
+            this.updateCartUI();
+            alert('Корзина очищена!');
+        }
+    }
+};
+
+// Инициализация приложения после загрузки DOM
+document.addEventListener('DOMContentLoaded', () => {
+    app.init();
+});
+
+// Делаем app глобальной для вызова из HTML
 window.app = app;
