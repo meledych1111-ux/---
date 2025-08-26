@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StepStyle - Магазин обуви</title>
-    <link rel="stylesheet" href="style.css"
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
@@ -13,12 +13,12 @@
             <p>Ваш стиль начинается с правильной обуви!</p>
         </header>
 
-<nav class="categories">
-    <button class="category-btn active" data-category="all">Все товары</button>
-    <button class="category-btn" data-category="sneakers">👟 Кроссовки</button>
-    <button class="category-btn" data-category="shoes">👞 Туфли</button>
-    <button class="category-btn" data-category="boots">👢 Сапоги</button>
-</nav>
+        <nav class="categories">
+            <button class="category-btn active" data-category="all">Все товары</button>
+            <button class="category-btn" data-category="sneakers">👟 Кроссовки</button>
+            <button class="category-btn" data-category="shoes">👞 Туфли</button>
+            <button class="category-btn" data-category="boots">👢 Сапоги</button>
+        </nav>
 
         <div class="filters">
             <div class="search-box">
@@ -41,21 +41,28 @@
             🛒
             <div class="cart-badge" id="cart-badge">0</div>
         </div>
+    </div>
 
-        <!-- Модальное окно корзины -->
-        <div class="cart-total">
-    <h3>🎯 Общая сумма: <span id="cart-total">0</span> руб.</h3>
-    <button onclick="app.checkout()">
-        ✅ Оформить заказ
-    </button>
-    <button onclick="app.clearCart()" class="btn-danger">
-        🗑️ Очистить корзину
-    </button>
-</div>
+    <!-- Модальное окно корзины -->
+    <div id="cart-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="app.hideCart()">&times;</span>
+            <h2>🛒 Ваша корзина</h2>
+            <div id="cart-items" class="cart-items">
+                <!-- Товары корзины будут здесь -->
+            </div>
+            <div class="cart-total">
+                <h3>🎯 Общая сумма: <span id="cart-total">0</span> руб.</h3>
+                <button onclick="app.checkout()" class="btn-primary">
+                    ✅ Оформить заказ
+                </button>
+                <button onclick="app.clearCart()" class="btn-danger">
+                    🗑️ Очистить корзину
+                </button>
             </div>
         </div>
     </div>
 
-    <script type="module" src="script.js"></script>>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
