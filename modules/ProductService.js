@@ -1,4 +1,4 @@
-import { products } from './Products.js';
+import { products } from './products.js';
 
 export class ProductService {
     constructor() {
