@@ -1,56 +1,52 @@
 export class FilterService {
     constructor() {
         this.filters = {
+            category: 'all',
             searchText: '',
-            priceRange: 'all',
-            category: 'all'
+            priceRange: 'all'
         };
-    }
-
-    applyFilters(products, filters) {
-        let filteredProducts = products;
-
-        // Фильтр по категории
-        if (filters.category !== 'all') {
-            filteredProducts = filteredProducts.filter(product => 
-                product.category === filters.category
-            );
-        }
-
-        // Поиск по тексту
-        if (filters.searchText) {
-            const searchLower = filters.searchText.toLowerCase();
-            filteredProducts = filteredProducts.filter(product =>
-                product.name.toLowerCase().includes(searchLower) ||
-                product.description.toLowerCase().includes(searchLower)
-            );
-        }
-
-        // Фильтр по цене
-        filteredProducts = this.filterByPrice(filteredProducts, filters.priceRange);
-
-        return filteredProducts;
-    }
-
-    filterByPrice(products, priceRange) {
-        switch (priceRange) {
-            case '0-5000':
-                return products.filter(product => product.price <= 5000);
-            case '5000-10000':
-                return products.filter(product => product.price > 5000 && product.price <= 10000);
-            case '10000+':
-                return products.filter(product => product.price > 10000);
-            default:
-                return products;
-        }
     }
 
     updateFilter(key, value) {
         this.filters[key] = value;
-        return this.filters;
     }
 
     getCurrentFilters() {
-        return { ...this.filters };
+        return this.filters;
+    }
+
+    applyFilters(products, filters) {
+        let result = [...products];
+
+        // Фильтр по категории
+        if (filters.category && filters.category !== 'all') {
+            result = result.filter(p => p.category === filters.category);
+        }
+
+        // Фильтр по поиску
+        if (filters.searchText && filters.searchText.trim() !== '') {
+            const query = filters.searchText.toLowerCase();
+            result = result.filter(p =>
+                p.name.toLowerCase().includes(query) ||
+                p.description.toLowerCase().includes(query)
+            );
+        }
+
+        // Фильтр по цене
+        if (filters.priceRange && filters.priceRange !== 'all') {
+            switch (filters.priceRange) {
+                case '0-5000':
+                    result = result.filter(p => p.price <= 5000);
+                    break;
+                case '5000-10000':
+                    result = result.filter(p => p.price > 5000 && p.price <= 10000);
+                    break;
+                case '10000+':
+                    result = result.filter(p => p.price > 10000);
+                    break;
+            }
+        }
+
+        return result;
     }
 }
