@@ -1,85 +1,56 @@
-/**
- * Данные товаров для магазина обуви
- * Легко редактировать и добавлять новые товары
- */
-
 export const products = [
     {
         id: 1,
-        name: "👟 Кроссовки Nike Air Max",
-        price: 8990,
-        image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop",
-        description: "Стильные и удобные кроссовки для повседневной носки. Технология Air Max для максимального комфорта.",
-        sizes: [38, 39, 40, 41, 42, 43, 44],
-        category: "sneakers"
+        name: "Кроссовки Nike Air Max",
+        price: 7990,
+        category: "sneakers",
+        sizes: [36, 37, 38, 39, 40, 41, 42],
+        image: "https://via.placeholder.com/300x200?text=Nike+Air+Max",
+        description: "Стильные и удобные кроссовки для повседневной носки"
     },
     {
         id: 2,
-        name: "👟 Кеды Converse Classic",
-        price: 4990,
-        image: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=400&h=300&fit=crop",
-        description: "Классические кеды на любой случай. Вечная классика, которая никогда не выходит из моды.",
-        sizes: [37, 38, 39, 40, 41, 42],
-        category: "sneakers"
+        name: "Ботинки Timberland",
+        price: 12990,
+        category: "boots",
+        sizes: [39, 40, 41, 42, 43],
+        image: "https://via.placeholder.com/300x200?text=Timberland",
+        description: "Качественные ботинки для холодной погоды"
     },
     {
         id: 3,
-        name: "👢 Сапоги зимние утепленные",
-        price: 7590,
-        image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&h=350&fit=crop",
-        description: "Теплые сапоги для суровой зимы. Меховая подкладка и водонепроницаемая мембрана.",
-        sizes: [36, 37, 38, 39, 40, 41],
-        category: "boots"
+        name: "Сандалии Adidas",
+        price: 2990,
+        category: "sandals",
+        sizes: [36, 37, 38, 39, 40],
+        image: "https://via.placeholder.com/300x200?text=Adidas+Sandals",
+        description: "Легкие и удобные сандалии для лета"
     },
     {
         id: 4,
-        name: "👞 Туфли офисные кожаные",
-        price: 6590,
-        image: "https://images.unsplash.com/photo-1560769684-55015cee73d7?w=400&h=300&fit=crop",
-        description: "Элегантные туфли для делового стиля. Качественная натуральная кожа и удобная колодка.",
-        sizes: [38, 39, 40, 41, 42, 43],
-        category: "shoes"
+        name: "Туфли на каблуке",
+        price: 5990,
+        category: "heels",
+        sizes: [35, 36, 37, 38],
+        image: "https://via.placeholder.com/300x200?text=Heels",
+        description: "Элегантные туфли для вечерних выходов"
     },
     {
         id: 5,
-        name: "👠 Туфли вечерние на каблуке",
+        name: "Кроссовки Adidas Ultraboost",
         price: 8990,
-        image: "https://images.unsplash.com/photo-1534653299134-96a9b2b7f1e6?w=400&h=300&fit=crop",
-        description: "Элегантные вечерние туфли для особых случаев. Идеальны для торжественных мероприятий.",
-        sizes: [36, 37, 38, 39],
-        category: "shoes"
+        category: "sneakers",
+        sizes: [38, 39, 40, 41, 42],
+        image: "https://via.placeholder.com/300x200?text=Adidas+Ultraboost",
+        description: "Технологичные кроссовки для бега"
+    },
+    {
+        id: 6,
+        name: "Зимние ботинки North Face",
+        price: 15990,
+        category: "boots",
+        sizes: [38, 39, 40, 41, 42, 43],
+        image: "https://via.placeholder.com/300x200?text=North+Face",
+        description: "Теплые зимние ботинки для экстремальных условий"
     }
 ];
-
-/**
- * Вспомогательные функции для работы с товарами
- */
-export const ProductUtils = {
-    getByCategory: (category) => {
-        if (category === 'all') return products;
-        return products.filter(product => product.category === category);
-    },
-
-    search: (query) => {
-        const searchTerm = query.toLowerCase();
-        return products.filter(product =>
-            product.name.toLowerCase().includes(searchTerm) ||
-            product.description.toLowerCase().includes(searchTerm)
-        );
-    },
-
-    filterByPrice: (productsArray, priceRange) => {
-        switch (priceRange) {
-            case '0-5000':
-                return productsArray.filter(product => product.price <= 5000);
-            case '5000-10000':
-                return productsArray.filter(product => product.price > 5000 && product.price <= 10000);
-            case '10000+':
-                return productsArray.filter(product => product.price > 10000);
-            default:
-                return productsArray;
-        }
-    },
-
-    getById: (id) => products.find(product => product.id === id)
-};
